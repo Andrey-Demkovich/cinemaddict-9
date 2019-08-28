@@ -1,3 +1,4 @@
+import {filmsDatas} from "./components/data.js";
 import {headerSearchBlock} from "./components/search.js";
 import {headerProfileBlock} from "./components/profile.js";
 import {mainNavigationSortBlock as mainMenuBlock} from "./components/menu.js";
@@ -44,14 +45,32 @@ const renderHtmlFilmsListContainers = () => {
   const filmsListContainerElements = document.querySelectorAll(
       `.films-list__container`
   );
-  for (let i = 0; i < 5; i++) {
-    renderHtmlElement(filmCardBlock(), filmsListContainerElements[0]);
-    if (i > 1) {
-      continue;
-    }
-    renderHtmlElement(filmCardBlock(), filmsListContainerElements[1]);
-    renderHtmlElement(filmCardBlock(), filmsListContainerElements[2]);
-  }
+  console.log(filmsDatas);
+  filmsDatas.slice(0, 5).forEach((filmData, i) => {
+    renderHtmlElement(filmCardBlock(filmData), filmsListContainerElements[0]);
+
+    // if (i > 1) {
+    //   return;
+    // }
+    // renderHtmlElement(filmCardBlock(filmData), filmsListContainerElements[1]);
+    // renderHtmlElement(filmCardBlock(filmData), filmsListContainerElements[2]);
+  });
+
+  filmsDatas
+    .slice()
+    .sort((a, b) => b.rating - a.rating)
+    .slice()
+    .forEach((filmData, i) => {
+      renderHtmlElement(filmCardBlock(filmData), filmsListContainerElements[1]);
+    });
+
+  filmsDatas
+    .slice()
+    .sort((a, b) => b.coments - a.coments)
+    .slice(0, 2)
+    .forEach((filmData, i) => {
+      renderHtmlElement(filmCardBlock(filmData), filmsListContainerElements[2]);
+    });
 };
 
 renderHtmlHeader();
