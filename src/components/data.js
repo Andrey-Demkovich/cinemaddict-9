@@ -1,4 +1,21 @@
-import {shuffle, getRandomInteger} from "./utils.js";
+import {
+  DURATION_FILMS_MIN,
+  DURATION_FILMS_MAX,
+  FILM_YEAR_START,
+  FILM_YEAR_END,
+  MIN_RATING,
+  MAX_RATING,
+  MIN_COMENTS,
+  MAX_COMENTS,
+  MAX_FILMS_LIST,
+  MAX_FILMS_WATCHED,
+  PROFILE_NOVICE,
+  PROFILE_FAN,
+  MIN_AGE,
+  MAX_AGE
+} from "./constants.js";
+
+import {shuffle, getRandomInteger, getRandomBoolean} from "./utils.js";
 
 const filmsNames = [
   `The Shawshank Redemption `,
@@ -62,8 +79,11 @@ const filmsGanres = [
 ];
 
 const generateFilmDuration = () => {
-  let minutDuration = getRandomInteger(20, 110);
-  let hourDuration = minutDuration / 60;
+  const minutDuration = getRandomInteger(
+      DURATION_FILMS_MIN,
+      DURATION_FILMS_MAX
+  );
+  const hourDuration = minutDuration / 60;
   let filmDuration;
   if (hourDuration > 1) {
     filmDuration = `${Math.floor(hourDuration)}h ${Math.round(
@@ -83,21 +103,56 @@ const generateFilmData = () => {
     description: shuffle(descriptionsFilms)
       .slice(0, getRandomInteger(1, 3))
       .join(` `),
-    year: getRandomInteger(1900, 2019),
+    year: getRandomInteger(FILM_YEAR_START, FILM_YEAR_END),
     ganre: filmsGanres[getRandomInteger(0, filmsGanres.length - 1)],
-    rating: (4 + (10 - 4) * Math.random()).toFixed(1),
+    rating: (MIN_RATING + (MAX_RATING - MIN_RATING) * Math.random()).toFixed(1),
     duration: generateFilmDuration(),
-    coments: getRandomInteger(1, 9)
+    coments: getRandomInteger(MIN_COMENTS, MAX_COMENTS),
+    isWatchlist: getRandomBoolean(),
+    isWatched: getRandomBoolean(),
+    isFavorite: getRandomBoolean(),
+    age: getRandomInteger(MIN_AGE, MAX_AGE)
   };
 };
 
 const generateFilmsDataList = () => {
   const filmsDataList = [];
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < MAX_FILMS_LIST; i++) {
     filmsDataList.push(generateFilmData());
   }
 
   return filmsDataList;
 };
 
-export const filmsDatas = generateFilmsDataList();
+export const generateProfileRating = () => {
+  const filmsWatched = getRandomInteger(0, MAX_FILMS_WATCHED);
+
+  let profileRating;
+
+  if (filmsWatched === 0) {
+    profileRating = ``;
+  } else if (filmsWatched <= PROFILE_NOVICE) {
+    profileRating = `novice`;
+  } else if (filmsWatched <= PROFILE_FAN) {
+    profileRating = `fan`;
+  } else {
+    profileRating = `movie buff`;
+  }
+
+  return profileRating;
+};
+
+const generateFiltersData = (filmsData) => {
+  const watchlistFilms = filmsData.slice().filter((film) => film.isWatchlist);
+  const historyFilms = filmsData.slice().filter((film) => film.isWatched);
+  const favoritesFilms = filmsData.slice().filter((film) => film.isFavorite);
+
+  return [
+    {title: `Watchlist`, count: watchlistFilms.length},
+    {title: `History`, count: historyFilms.length},
+    {title: `Favorites`, count: favoritesFilms.length}
+  ];
+};
+
+export const filmsData = generateFilmsDataList();
+export const filtersData = generateFiltersData(filmsData);

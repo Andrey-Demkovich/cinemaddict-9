@@ -1,4 +1,9 @@
-import {filmsDatas} from "./components/data.js";
+import {STEP_FILMS_SHOW, MAX_FILMS_LIST} from "./components/constants.js";
+import {
+  filmsData,
+  generateProfileRating,
+  filtersData
+} from "./components/data.js";
 import {headerSearchBlock} from "./components/search.js";
 import {headerProfileBlock} from "./components/profile.js";
 import {mainNavigationSortBlock as mainMenuBlock} from "./components/menu.js";
@@ -7,6 +12,10 @@ import {filmsListBlock} from "./components/films-list.js";
 import {filmsListContainerBlock} from "./components/films-list-container.js";
 import {filmCardBlock} from "./components/film-card.js";
 import {showMoreBlock} from "./components/show-more.js";
+import {filmDetailsBlock} from "./components/film-details.js";
+
+const footerStatisticsElement = document.querySelector(`.footer__statistics p`);
+footerStatisticsElement.innerHTML = `${MAX_FILMS_LIST} movies inside`;
 
 const renderHtmlElement = (block, elementToInsert) =>
   elementToInsert.insertAdjacentHTML(`beforeend`, block);
@@ -14,12 +23,12 @@ const renderHtmlElement = (block, elementToInsert) =>
 const renderHtmlHeader = () => {
   const headerElement = document.querySelector(`.header`);
   renderHtmlElement(headerSearchBlock(), headerElement);
-  renderHtmlElement(headerProfileBlock(), headerElement);
+  renderHtmlElement(headerProfileBlock(generateProfileRating()), headerElement);
 };
 
 const renderHtmlMain = () => {
   const mainElement = document.querySelector(`.main`);
-  renderHtmlElement(mainMenuBlock(), mainElement);
+  renderHtmlElement(mainMenuBlock(filtersData), mainElement);
   renderHtmlElement(filmsBlock(), mainElement);
 };
 
@@ -45,32 +54,45 @@ const renderHtmlFilmsListContainers = () => {
   const filmsListContainerElements = document.querySelectorAll(
       `.films-list__container`
   );
-  console.log(filmsDatas);
-  filmsDatas.slice(0, 5).forEach((filmData, i) => {
-    renderHtmlElement(filmCardBlock(filmData), filmsListContainerElements[0]);
+  const LoadMoreElement = document.querySelector(`.films-list__show-more`);
 
-    // if (i > 1) {
-    //   return;
-    // }
-    // renderHtmlElement(filmCardBlock(filmData), filmsListContainerElements[1]);
-    // renderHtmlElement(filmCardBlock(filmData), filmsListContainerElements[2]);
-  });
+  let countFilmsShow = 0;
 
-  filmsDatas
-    .slice()
-    .sort((a, b) => b.rating - a.rating)
-    .slice()
-    .forEach((filmData, i) => {
-      renderHtmlElement(filmCardBlock(filmData), filmsListContainerElements[1]);
-    });
+  const renderFilmsList = () =>
+    filmsData
+      .slice(countFilmsShow, (countFilmsShow += STEP_FILMS_SHOW))
+      .forEach((filmData) => {
+        renderHtmlElement(
+            filmCardBlock(filmData),
+            filmsListContainerElements[0]
+        );
+      });
 
-  filmsDatas
-    .slice()
-    .sort((a, b) => b.coments - a.coments)
-    .slice(0, 2)
-    .forEach((filmData, i) => {
-      renderHtmlElement(filmCardBlock(filmData), filmsListContainerElements[2]);
-    });
+  const renderFilmsExtraList = (property, element) =>
+    filmsData
+      .slice()
+      .sort((a, b) => b[property] - a[property])
+      .slice(0, 2)
+      .forEach((filmData) => {
+        renderHtmlElement(
+            filmCardBlock(filmData),
+            filmsListContainerElements[element]
+        );
+      });
+
+  const onLoadMoreClick = () => {
+    renderFilmsList();
+
+    if (countFilmsShow >= filmsData.length) {
+      LoadMoreElement.style.display = `none`;
+      LoadMoreElement.removeEventListener(`click`, onLoadMoreClick);
+    }
+  };
+
+  renderFilmsList();
+  renderFilmsExtraList(`rating`, 1);
+  renderFilmsExtraList(`coments`, 2);
+  LoadMoreElement.addEventListener(`click`, onLoadMoreClick);
 };
 
 renderHtmlHeader();
@@ -78,3 +100,4 @@ renderHtmlMain();
 renderHtmlFilmsSection();
 renderHtmlFilmsListSections();
 renderHtmlFilmsListContainers();
+// renderHtmlElement(filmDetailsBlock(filmsData[0]), document.body); // для просмотра попапа детальной информации -  раскоментировать строку

@@ -1,0 +1,15 @@
+export const STEP_FILMS_SHOW = 5;
+export const DURATION_FILMS_MIN = 20; // минут
+export const DURATION_FILMS_MAX = 110; // минут
+export const FILM_YEAR_START = 1900; // год
+export const FILM_YEAR_END = 2019; // год
+export const MIN_RATING = 4;
+export const MAX_RATING = 10;
+export const MIN_COMENTS = 1;
+export const MAX_COMENTS = 9;
+export const MAX_FILMS_LIST = 18;
+export const MAX_FILMS_WATCHED = 30;
+export const PROFILE_NOVICE = 10;
+export const PROFILE_FAN = 20;
+export const MIN_AGE = 6;
+export const MAX_AGE = 18;
